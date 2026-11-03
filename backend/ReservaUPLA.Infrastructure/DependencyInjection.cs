@@ -17,6 +17,7 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString));
 
         services.AddScoped<IUsuarioService, UsuarioService>();
+        services.AddScoped<IAmbienteService, AmbienteService>();
 
         return services;
     }
