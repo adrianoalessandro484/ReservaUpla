@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ReservaUPLA.API/ReservaUPLA.API.csproj" />
+  <Project Path="ReservaUPLA.Application/ReservaUPLA.Application.csproj" />
+  <Project Path="ReservaUPLA.Domain/ReservaUPLA.Domain.csproj" />
+  <Project Path="ReservaUPLA.Infrastructure/ReservaUPLA.Infrastructure.csproj" />
+</Solution>
