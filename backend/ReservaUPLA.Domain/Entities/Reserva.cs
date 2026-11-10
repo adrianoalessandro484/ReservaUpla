@@ -1,4 +1,4 @@
-using ReservaUPLA.Domain.Constants;
+using ReservaUPLA.Domain.Enums;
 
 namespace ReservaUPLA.Domain.Entities;
 
@@ -9,9 +9,9 @@ public class Reserva
     public TimeOnly HoraInicio { get; set; }
     public TimeOnly HoraFin { get; set; }
     public string Motivo { get; set; } = string.Empty;
-    public string Estado { get; set; } = EstadosReserva.Pendiente;
+    public EstadoReserva Estado { get; set; } = EstadoReserva.Pendiente;
 
-    // Foreign Keys
+    // Foreign Keys y Referencias de Objetos
     public Guid UsuarioId { get; set; }
     public Usuario? Usuario { get; set; }
 

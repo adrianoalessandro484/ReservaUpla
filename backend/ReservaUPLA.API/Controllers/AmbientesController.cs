@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using ReservaUPLA.Application.Common.Exceptions;
 using ReservaUPLA.Application.DTOs.Ambiente;
 using ReservaUPLA.Application.Interfaces;
 
@@ -32,15 +31,8 @@ public class AmbientesController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<AmbienteDto>> ObtenerPorId(Guid id)
     {
-        try
-        {
-            var ambiente = await _ambienteService.ObtenerPorIdAsync(id);
-            return Ok(ambiente);
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { mensaje = ex.Message });
-        }
+        var ambiente = await _ambienteService.ObtenerPorIdAsync(id);
+        return Ok(ambiente);
     }
 
     /// <summary>
@@ -69,20 +61,8 @@ public class AmbientesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<AmbienteDto>> Registrar([FromBody] AmbienteCreateDto dto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        try
-        {
-            var creado = await _ambienteService.RegistrarAmbienteAsync(dto);
-            return CreatedAtAction(nameof(ObtenerPorId), new { id = creado.Id }, creado);
-        }
-        catch (BusinessRuleException ex)
-        {
-            return BadRequest(new { mensaje = ex.Message });
-        }
+        var creado = await _ambienteService.RegistrarAmbienteAsync(dto);
+        return CreatedAtAction(nameof(ObtenerPorId), new { id = creado.Id }, creado);
     }
 
     /// <summary>
@@ -91,49 +71,17 @@ public class AmbientesController : ControllerBase
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<AmbienteDto>> Actualizar(Guid id, [FromBody] AmbienteUpdateDto dto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        try
-        {
-            var actualizado = await _ambienteService.ActualizarAmbienteAsync(id, dto);
-            return Ok(actualizado);
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { mensaje = ex.Message });
-        }
-        catch (BusinessRuleException ex)
-        {
-            return BadRequest(new { mensaje = ex.Message });
-        }
+        var actualizado = await _ambienteService.ActualizarAmbienteAsync(id, dto);
+        return Ok(actualizado);
     }
 
     /// <summary>
-    /// Cambiar el estado operativo de un ambiente (Disponible, En Mantenimiento, No Disponible)
+    /// Cambiar el estado operativo de un ambiente (Disponible, En Mantenimiento, Inactivo)
     /// </summary>
     [HttpPatch("{id:guid}/estado")]
     public async Task<ActionResult<AmbienteDto>> CambiarEstado(Guid id, [FromBody] AmbienteCambiarEstadoDto dto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        try
-        {
-            var actualizado = await _ambienteService.CambiarEstadoAsync(id, dto.NuevoEstado);
-            return Ok(actualizado);
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { mensaje = ex.Message });
-        }
-        catch (BusinessRuleException ex)
-        {
-            return BadRequest(new { mensaje = ex.Message });
-        }
+        var actualizado = await _ambienteService.CambiarEstadoAsync(id, dto.NuevoEstado);
+        return Ok(actualizado);
     }
 }

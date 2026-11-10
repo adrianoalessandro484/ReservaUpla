@@ -1,8 +1,9 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using ReservaUPLA.API.Middlewares;
 using ReservaUPLA.Infrastructure;
 using ReservaUPLA.Infrastructure.Data;
-using Scalar.AspNetCore;
+using ReservaUPLA.Infrastructure.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Controladores con configuración JSON
+// Controladores con serialización de Enums como cadenas legibles
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -25,24 +26,36 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
-// Infraestructura y Persistencia (EF Core + PostgreSQL)
+// Infraestructura, Repositorios y Servicios de Aplicación
 builder.Services.AddInfrastructure(builder.Configuration);
 
 // OpenAPI / Swagger Documentation
-builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Inicializar la base de datos automáticamente si Postgres está listo
+// Middleware Global de Manejo de Errores
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+// Swagger UI disponible tanto en desarrollo como en producción
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ReservaUPLA API v1");
+    c.RoutePrefix = "swagger";
+});
+
+// Inicializar la base de datos y sembrar datos iniciales si PostgreSQL está disponible
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var logger = services.GetRequiredService<ILogger<Program>>();
     try
     {
-        var context = services.GetRequiredService<ReservaDbContext>();
+        var context = services.GetRequiredService<AppDbContext>();
         logger.LogInformation("Verificando y aplicando inicialización de la Base de Datos...");
-        await DbInitializer.InitializeAsync(context);
+        await DbSeeder.SeedAsync(context);
         logger.LogInformation("Base de datos lista con datos iniciales de ReservaUPLA.");
     }
     catch (Exception ex)
@@ -52,12 +65,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Pipeline HTTP
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
-
 app.UseCors("CorsPolicy");
 
 app.UseAuthorization();

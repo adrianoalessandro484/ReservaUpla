@@ -23,12 +23,3 @@ public class DashboardIndicadoresDto
     public List<AmbienteUsoMetricaDto> UsoPorAmbiente { get; set; } = new();
     public List<ReservaDto> ProximasReservas { get; set; } = new();
 }
-
-public class AmbienteUsoMetricaDto
-{
-    public Guid AmbienteId { get; set; }
-    public string Nombre { get; set; } = string.Empty;
-    public string Tipo { get; set; } = string.Empty;
-    public int TotalReservas { get; set; }
-    public int Aprobadas { get; set; }
-}

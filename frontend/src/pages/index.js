@@ -1,0 +1,10 @@
+export { default as LoginPage } from './LoginPage';
+export { default as DashboardPage } from './DashboardPage';
+export { default as ReservationsPage } from './ReservationsPage';
+export { default as CreateReservationPage } from './CreateReservationPage';
+export { default as RoomsPage } from './RoomsPage';
+export { default as UsersPage } from './UsersPage';
+export { default as SchedulePage } from './SchedulePage';
+export { default as ReportsPage } from './ReportsPage';
+export { default as MyReservationsPage } from './MyReservationsPage';
+export { default as NotFoundPage } from './NotFoundPage';

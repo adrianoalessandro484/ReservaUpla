@@ -26,3 +26,9 @@ Thumbs.db
 *.log
 .idea/
 .vscode/
+
+# Documentos excluidos de entrega
+*.pdf
+"Caso práctico  .pdf"
+INFORME_TECNICO.md
+

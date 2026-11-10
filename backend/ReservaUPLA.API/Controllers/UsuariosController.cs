@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using ReservaUPLA.Application.Common.Exceptions;
 using ReservaUPLA.Application.DTOs.Usuario;
 using ReservaUPLA.Application.Interfaces;
 
@@ -32,19 +31,12 @@ public class UsuariosController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<UsuarioDto>> ObtenerPorId(Guid id)
     {
-        try
-        {
-            var usuario = await _usuarioService.ObtenerPorIdAsync(id);
-            return Ok(usuario);
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { mensaje = ex.Message });
-        }
+        var usuario = await _usuarioService.ObtenerPorIdAsync(id);
+        return Ok(usuario);
     }
 
     /// <summary>
-    /// Obtener usuarios filtrados por rol institucional (ej. Solicitante, Administrador)
+    /// Obtener usuarios filtrados por rol institucional (ej. Solicitante, Administrador, ResponsableAmbiente)
     /// </summary>
     [HttpGet("rol/{rol}")]
     public async Task<ActionResult<IEnumerable<UsuarioDto>>> ObtenerPorRol(string rol)
@@ -59,46 +51,18 @@ public class UsuariosController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<UsuarioDto>> Registrar([FromBody] UsuarioCreateDto dto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        try
-        {
-            var creado = await _usuarioService.RegistrarUsuarioAsync(dto);
-            return CreatedAtAction(nameof(ObtenerPorId), new { id = creado.Id }, creado);
-        }
-        catch (BusinessRuleException ex)
-        {
-            return BadRequest(new { mensaje = ex.Message });
-        }
+        var creado = await _usuarioService.RegistrarUsuarioAsync(dto);
+        return CreatedAtAction(nameof(ObtenerPorId), new { id = creado.Id }, creado);
     }
 
     /// <summary>
-    /// Actualizar información de un usuario
+    /// Actualizar información de un usuario institucional
     /// </summary>
     [HttpPut("{id:guid}")]
     public async Task<ActionResult<UsuarioDto>> Actualizar(Guid id, [FromBody] UsuarioUpdateDto dto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        try
-        {
-            var actualizado = await _usuarioService.ActualizarUsuarioAsync(id, dto);
-            return Ok(actualizado);
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { mensaje = ex.Message });
-        }
-        catch (BusinessRuleException ex)
-        {
-            return BadRequest(new { mensaje = ex.Message });
-        }
+        var actualizado = await _usuarioService.ActualizarUsuarioAsync(id, dto);
+        return Ok(actualizado);
     }
 
     /// <summary>
@@ -107,14 +71,17 @@ public class UsuariosController : ControllerBase
     [HttpPatch("{id:guid}/toggle-activo")]
     public async Task<ActionResult> CambiarEstadoActivo(Guid id)
     {
-        try
-        {
-            var nuevoEstado = await _usuarioService.CambiarEstadoActivoAsync(id);
-            return Ok(new { id, activo = nuevoEstado, mensaje = $"Usuario {(nuevoEstado ? "activado" : "desactivado")} exitosamente." });
-        }
-        catch (NotFoundException ex)
-        {
-            return NotFound(new { mensaje = ex.Message });
-        }
+        var nuevoEstado = await _usuarioService.CambiarEstadoActivoAsync(id);
+        return Ok(new { id, activo = nuevoEstado, mensaje = $"Usuario {(nuevoEstado ? "activado" : "desactivado")} exitosamente." });
+    }
+
+    /// <summary>
+    /// Iniciar sesión institucional con Código y Contraseña
+    /// </summary>
+    [HttpPost("login")]
+    public async Task<ActionResult<UsuarioDto>> IniciarSesion([FromBody] LoginRequestDto dto)
+    {
+        var usuario = await _usuarioService.AutenticarAsync(dto.Codigo, dto.Contrasena);
+        return Ok(usuario);
     }
 }
